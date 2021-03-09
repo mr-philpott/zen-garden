@@ -15,9 +15,9 @@ let noise = new Noise(Date.now());
 for (let y = 0; y < c.height * 4; y += 4) {
     for (let x = 0; x < c.width * 4; x += 4) {
         let value = noise.simplex2(x / (c.width * 4), y / (c.height * 4));
-        let r = Math.round(255 - 255 * (value > 0 ? 1 : 0));
-        let g = Math.round(255 - 255 * (value > 0 ? 1 : 0));
-        let b = Math.round(255 - 255 * (value > 0 ? 1 : 0));
+        let r = Math.round(255 - 255 * (value > 0 ? 0 : 1));
+        let g = Math.round(255 - 255 * (value > 0 ? 0 : 1));
+        let b = Math.round(255 - 255 * (value > 0 ? 0 : 1));
         let a = 255;
         imageData.data[y * c.width + x + 0] = r;
         imageData.data[y * c.width + x + 1] = g;
