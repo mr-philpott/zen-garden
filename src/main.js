@@ -1,6 +1,6 @@
 "use strict";
 
-import { Noise } from "/noise.js";
+import { Noise } from "./noise.js";
 
 const c = document.getElementById("canvas");
 const ctx = c.getContext("2d");
