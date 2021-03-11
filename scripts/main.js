@@ -9,6 +9,7 @@ c.width = window.innerWidth;
 c.height = window.innerHeight;
 
 // cosnts
+const ROCK_RADIUS = 100;
 const ROCK_VERTS = 10;
 const ROCK_OFFSET_RANGE = 10;
 
@@ -238,17 +239,22 @@ class Map {
     }
 
     Rocks(centx, centy) {
-        for (let y = -50 * 2; y < 50 * 2; y += 4) {
-            for (let x = -50 * 2; x < 50 * 2; x += 4) {
-                this.imageData.data[
-                    (centy + y) * c.width + (centx + x) + 0
-                ] = 0;
-                this.imageData.data[
-                    (centy + y) * c.width + (centx + x) + 1
-                ] = 0;
-                this.imageData.data[
-                    (centy + y) * c.width + (centx + x) + 2
-                ] = 0;
+        let turn = (Math.PI * 2) / ROCK_VERTS;
+        let points = [];
+
+        for (let y = -70 * 2; y < 70 * 2; y += 4) {
+            for (let x = -70 * 2; x < 70 * 2; x += 4) {
+                let value = this.noise.simplex2(
+                    y / ROCK_RADIUS,
+                    x / ROCK_RADIUS
+                );
+                let rgba = this.Colors(value);
+                this.imageData.data[(centy + y) * c.width + (centx + x) + 0] =
+                    rgba[0];
+                this.imageData.data[(centy + y) * c.width + (centx + x) + 1] =
+                    rgba[1];
+                this.imageData.data[(centy + y) * c.width + (centx + x) + 2] =
+                    rgba[2];
             }
         }
         console.log(this.imageData);
