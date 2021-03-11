@@ -22,7 +22,6 @@ class Map {
         // Central makes the map by calling other smaller functions
         this.Central();
     }
-
     // returns a rgba color value for a given input ranging from 0 to 1
     Colors(value) {
         let r, g, b, a;
@@ -33,19 +32,31 @@ class Map {
 
         if (value > 0.6) {
             // highland
-            r = 184;
-            g = 209;
-            b = 148;
+            r = [184, 194, 204][Math.floor(Math.random() * 2)];
+            g = [209, 219, 229][Math.floor(Math.random() * 2)];
+            b = [148, 158, 268][Math.floor(Math.random() * 2)];
         } else if (value > 0.575) {
             // highland shadow
-            r = Lerp(161, 129, (value - 0.575) * 20);
-            g = Lerp(191, 171, (value - 0.575) * 20);
-            b = Lerp(130, 103, (value - 0.575) * 20);
+            r = Lerp(
+                [161, 171][Math.floor(Math.random() * 2)],
+                129,
+                (value - 0.575) * 20
+            );
+            g = Lerp(
+                [191, 201][Math.floor(Math.random() * 2)],
+                171,
+                (value - 0.575) * 20
+            );
+            b = Lerp(
+                [130, 140][Math.floor(Math.random() * 2)],
+                103,
+                (value - 0.575) * 20
+            );
         } else if (value > 0.5) {
-            // normal land
-            r = 161; // 250 - (250 - ) * value * 4;
-            g = 191; // 242 - (242 - ) * value * 4;
-            b = 130; // 220 - (220 - ) * value * 4;
+            // hishish land
+            r = [161, 171][Math.floor(Math.random() * 2)]; // 250 - (250 - ) * value * 4;
+            g = [191, 201][Math.floor(Math.random() * 2)]; // 242 - (242 - ) * value * 4;
+            b = [130, 140][Math.floor(Math.random() * 2)]; // 220 - (220 - ) * value * 4;
         } else if (value > 0.475) {
             // wall
             r = Lerp(156, 161, (value - 0.475) * 10);
@@ -58,14 +69,15 @@ class Map {
             b = Lerp(220, 0, (value - 0.45) * 7.5);
         } else if (value > -0.7) {
             // normal land
-            r = 250;
-            g = 242;
-            b = 220;
+            252, 248, 230;
+            r = [250, 257][Math.floor(Math.random() * 2)];
+            g = [242, 253][Math.floor(Math.random() * 2)];
+            b = [220, 235][Math.floor(Math.random() * 2)];
         } else if (value > -1) {
             // water fade
-            r = Lerp(124, 149, (value + 1) * 3);
-            g = Lerp(150, 193, (value + 1) * 3);
-            b = Lerp(255, 237, (value + 1) * 3);
+            r = Lerp(124, 159, (value + 1) * 3);
+            g = Lerp(150, 213, (value + 1) * 3);
+            b = Lerp(255, 257, (value + 1) * 3);
         }
         a = 255; // Everything is full opacity
 
