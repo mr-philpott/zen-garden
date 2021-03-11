@@ -8,9 +8,18 @@ const ctx = c.getContext("2d");
 c.width = window.innerWidth;
 c.height = window.innerHeight;
 
+// cosnts
+const ROCK_VERTS = 10;
+const ROCK_OFFSET_RANGE = 10;
+
 // linear interpolation creates smmoth gradiants of colors
 function Lerp(a, b, t) {
     return (1 - t) * a + t * b; // woah math!
+}
+
+function InRange(check, compare, range) {
+    if (check > compare + range || check < compare - range) return false;
+    return true;
 }
 
 // Generates and updates the map
@@ -22,6 +31,16 @@ class Map {
         // Central makes the map by calling other smaller functions
         this.Central();
     }
+
+    Events() {
+        // when teh window is resized it regenerates the map, this might be a problem becuase of lag
+        window.addEventListener("resize", () => {
+            c.width = window.innerWidth;
+            c.height = window.innerHeight;
+            this.Central();
+        });
+    }
+
     // returns a rgba color value for a given input ranging from 0 to 1
     Colors(value) {
         let r, g, b, a;
@@ -32,56 +51,104 @@ class Map {
 
         if (value > 0.6) {
             // highland
-            r = [184, 194, 204][Math.floor(Math.random() * 2)];
-            g = [209, 219, 229][Math.floor(Math.random() * 2)];
-            b = [148, 158, 268][Math.floor(Math.random() * 2)];
+            return [
+                [184, 194, 204][Math.floor(Math.random() * 2)],
+                [209, 219, 229][Math.floor(Math.random() * 2)],
+                [148, 158, 268][Math.floor(Math.random() * 2)],
+                255,
+            ];
         } else if (value > 0.575) {
             // highland shadow
-            r = Lerp(
-                [161, 171][Math.floor(Math.random() * 2)],
-                129,
-                (value - 0.575) * 20
-            );
-            g = Lerp(
-                [191, 201][Math.floor(Math.random() * 2)],
-                171,
-                (value - 0.575) * 20
-            );
-            b = Lerp(
-                [130, 140][Math.floor(Math.random() * 2)],
-                103,
-                (value - 0.575) * 20
-            );
+            return [
+                Lerp(
+                    [161, 171][Math.floor(Math.random() * 2)],
+                    129,
+                    (value - 0.575) * 20
+                ),
+                Lerp(
+                    [191, 201][Math.floor(Math.random() * 2)],
+                    171,
+                    (value - 0.575) * 20
+                ),
+                Lerp(
+                    [130, 140][Math.floor(Math.random() * 2)],
+                    103,
+                    (value - 0.575) * 20
+                ),
+                255,
+            ];
         } else if (value > 0.5) {
             // hishish land
-            r = [161, 171][Math.floor(Math.random() * 2)]; // 250 - (250 - ) * value * 4;
-            g = [191, 201][Math.floor(Math.random() * 2)]; // 242 - (242 - ) * value * 4;
-            b = [130, 140][Math.floor(Math.random() * 2)]; // 220 - (220 - ) * value * 4;
+            return [
+                [161, 171][Math.floor(Math.random() * 2)],
+                [191, 201][Math.floor(Math.random() * 2)],
+                [130, 140][Math.floor(Math.random() * 2)],
+                255,
+            ];
         } else if (value > 0.475) {
             // wall
-            r = Lerp(156, 161, (value - 0.475) * 10);
-            g = Lerp(155, 191, (value - 0.475) * 10);
-            b = Lerp(152, 130, (value - 0.475) * 10);
+            return [
+                Lerp(156, 161, (value - 0.475) * 10),
+                Lerp(155, 191, (value - 0.475) * 10),
+                Lerp(152, 130, (value - 0.475) * 10),
+                255,
+            ];
         } else if (value > 0.45) {
             // normal land shadow
-            r = Lerp(250, 0, (value - 0.45) * 7.5);
-            g = Lerp(242, 0, (value - 0.45) * 7.5);
-            b = Lerp(220, 0, (value - 0.45) * 7.5);
-        } else if (value > -0.7) {
-            // normal land
-            252, 248, 230;
-            r = [250, 257][Math.floor(Math.random() * 2)];
-            g = [242, 253][Math.floor(Math.random() * 2)];
-            b = [220, 235][Math.floor(Math.random() * 2)];
-        } else if (value > -1) {
+            return [
+                Lerp(
+                    [250, 255][Math.floor(Math.random() * 2)],
+                    [240, 235][Math.floor(Math.random() * 2)],
+                    (value - 0.45) * 45
+                ),
+                Lerp(
+                    [242, 253][Math.floor(Math.random() * 2)],
+                    [227, 221][Math.floor(Math.random() * 2)],
+                    (value - 0.45) * 45
+                ),
+                Lerp(
+                    [220, 235][Math.floor(Math.random() * 2)],
+                    [194, 185][Math.floor(Math.random() * 2)],
+                    (value - 0.45) * 45
+                ),
+                255,
+            ];
+        } else if (value > -0.75) {
+            return [255, 255, 255, 255];
+        } else {
             // water fade
-            r = Lerp(124, 159, (value + 1) * 3);
-            g = Lerp(150, 213, (value + 1) * 3);
-            b = Lerp(255, 257, (value + 1) * 3);
+            return [
+                Lerp(Lerp(124, 159, (value + 1) * 3), 0, (value + 1) * 0.75),
+                Lerp(Lerp(150, 213, (value + 1) * 3), 0, (value + 1) * 0.75),
+                Lerp(Lerp(255, 255, (value + 1) * 3), 0, (value + 1) * 0.75),
+                255,
+            ];
         }
-        a = 255; // Everything is full opacity
+    }
 
-        return [r, g, b, a];
+    Sand(value) {
+        if (value > 0.5) {
+            return [
+                [255, 255][Math.floor(Math.random() * 2)],
+                [247, 255][Math.floor(Math.random() * 2)],
+                [225, 240][Math.floor(Math.random() * 2)],
+                255,
+            ];
+        } else if (value > 0) {
+            return [
+                [253, 255][Math.floor(Math.random() * 2)],
+                [246, 255][Math.floor(Math.random() * 2)],
+                [224, 239][Math.floor(Math.random() * 2)],
+                255,
+            ];
+        } else {
+            return [
+                [251, 255][Math.floor(Math.random() * 2)],
+                [243, 254][Math.floor(Math.random() * 2)],
+                [221, 236][Math.floor(Math.random() * 2)],
+                255,
+            ];
+        }
     }
 
     // The cental function whenever a new map needs to be generated.
@@ -96,20 +163,15 @@ class Map {
         // https://github.com/josephg/noisejs
         // ^ Taken from ^
 
-        this.Make();
+        this.Base();
+
+        ctx.putImageData(this.imageData, 0, 0);
     }
 
-    Events() {
-        // when teh window is resized it regenerates the map, this might be a problem becuase of lag
-        window.addEventListener("resize", () => {
-            c.width = window.innerWidth;
-            c.height = window.innerHeight;
-            this.Central();
-        });
-    }
-
-    Make() {
+    Base() {
         // for some reason, for the canvas to scale properly, it needs to go in increments of four
+
+        // For the main content
         for (let y = 0; y < c.height * 4; y += 4) {
             // ditto
             for (let x = 0; x < c.width * 4; x += 4) {
@@ -126,8 +188,70 @@ class Map {
                 this.imageData.data[y * c.width + x + 3] = rgba[3];
             }
         }
+
+        let blues = [];
+
+        //  A re-run through every pixel to add things such as props and the proper sand values
+        for (let y = 0; y < c.height * 4; y += 4) {
+            for (let x = 0; x < c.width * 4; x += 4) {
+                if (
+                    this.imageData.data[y * c.width + x + 0] === 255 &&
+                    this.imageData.data[y * c.width + x + 1] === 255 &&
+                    this.imageData.data[y * c.width + x + 2] === 255
+                ) {
+                    let value = this.noise.simplex2(
+                        (x / c.width) * 2,
+                        (y / c.height) * 2
+                    );
+                    let rgba = this.Sand(value);
+                    this.imageData.data[y * c.width + x + 0] = rgba[0];
+                    this.imageData.data[y * c.width + x + 1] = rgba[1];
+                    this.imageData.data[y * c.width + x + 2] = rgba[2];
+                    this.imageData.data[y * c.width + x + 3] = rgba[3];
+                } else if (
+                    InRange(this.imageData.data[y * c.width + x + 0], 126, 4) &&
+                    InRange(this.imageData.data[y * c.width + x + 1], 162, 4) &&
+                    InRange(this.imageData.data[y * c.width + x + 2], 208, 4)
+                ) {
+                    blues.push([x, y]);
+                }
+            }
+        }
+        let numOfRocks;
+        if (blues.length > 10000) {
+            numOfRocks = 25;
+        } else if (blues.length > 5000) {
+            numOfRocks = 15;
+        } else if (blues.length > 1000) {
+            numOfRocks = 5;
+        } else if (blues.length > 100) {
+            numOfRocks = 1;
+        }
+
+        for (
+            let i = 0;
+            i < blues.length;
+            i += Math.floor(blues.length / numOfRocks)
+        ) {
+            this.Rocks(blues[i][0], blues[i][1]);
+        }
+    }
+
+    Rocks(centx, centy) {
+        for (let y = -50 * 2; y < 50 * 2; y += 4) {
+            for (let x = -50 * 2; x < 50 * 2; x += 4) {
+                this.imageData.data[
+                    (centy + y) * c.width + (centx + x) + 0
+                ] = 0;
+                this.imageData.data[
+                    (centy + y) * c.width + (centx + x) + 1
+                ] = 0;
+                this.imageData.data[
+                    (centy + y) * c.width + (centx + x) + 2
+                ] = 0;
+            }
+        }
         console.log(this.imageData);
-        ctx.putImageData(this.imageData, 0, 0);
     }
 }
 
