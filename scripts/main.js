@@ -9,7 +9,7 @@ c.width = window.innerWidth;
 c.height = window.innerHeight;
 
 // cosnts
-const ROCK_RADIUS = 100;
+const ROCK_RADIUS = 1000;
 const ROCK_VERTS = 10;
 const ROCK_OFFSET_RANGE = 10;
 
@@ -21,6 +21,15 @@ function Lerp(a, b, t) {
 function InRange(check, compare, range) {
     if (check > compare + range || check < compare - range) return false;
     return true;
+}
+
+class Color {
+    constructor(red, green, blue, alpha) {
+        this.r = red;
+        this.g = green;
+        this.b = blue;
+        this.a = alpha;
+    }
 }
 
 class Polygon {
@@ -44,15 +53,26 @@ class Polygon {
         }
         return this.eqs;
     }
-}
 
-let poly = new Polygon([
-    [0, 0],
-    [0, 1],
-    [1, 1],
-    [1, 0],
-]);
-console.log(poly.GetEqs());
+    FindMaxMin() {
+        let minx = Infinity,
+            maxx = 0,
+            miny = Infinity,
+            maxy = 0;
+        for (let point of this.verts) {
+            if (point[0] > maxx) maxx = point[0];
+            if (point[0] < minx) minx = point[0];
+            if (point[1] > maxy) maxy = point[1];
+            if (point[1] < miny) miny = point[1];
+        }
+        return {
+            minx,
+            maxx,
+            miny,
+            maxy,
+        };
+    }
+}
 
 // Generates and updates the map
 class Map {
@@ -276,36 +296,50 @@ class Map {
         let eqs = [];
 
         for (let i = 0; i < ROCK_VERTS; i++) {
-            let x =
+            let xs =
+                centx +
                 Math.cos(turn * i) * ROCK_RADIUS +
                 Math.cos(turn * i) *
-                    Math.floor(Math.random() * ROCK_OFFSET_RANGE);
-            let y =
+                    (Math.floor(Math.random() * 2) > 0
+                        ? Math.floor(Math.random() * ROCK_OFFSET_RANGE)
+                        : Math.floor(Math.random() * -ROCK_OFFSET_RANGE));
+            let ys =
+                centy +
                 Math.sin(turn * i) * ROCK_RADIUS +
                 Math.sin(turn * i) *
-                    Math.floor(Math.random() * ROCK_OFFSET_RANGE);
-            points.push([x, y]);
+                    (Math.floor(Math.random() * 2) > 0
+                        ? Math.floor(Math.random() * ROCK_OFFSET_RANGE)
+                        : Math.floor(Math.random() * -ROCK_OFFSET_RANGE));
+            points.push([xs, ys]);
         }
 
+        let poly = new Polygon(points);
+        let eq = poly.GetEqs();
+        let mm = poly.FindMaxMin();
+
+        let [r, g, b] = [
+            Math.floor(Math.random() * 256),
+            Math.floor(Math.random() * 256),
+            Math.floor(Math.random() * 256),
+        ];
         for (let point of points) {
-        }
-
-        for (let y = -70 * 2; y < 70 * 2; y += 4) {
-            for (let x = -70 * 2; x < 70 * 2; x += 4) {
-                let value = this.noise.simplex2(
-                    y / ROCK_RADIUS,
-                    x / ROCK_RADIUS
-                );
-                let rgba = this.Colors(value);
-                this.imageData.data[(centy + y) * c.width + (centx + x) + 0] =
-                    rgba[0];
-                this.imageData.data[(centy + y) * c.width + (centx + x) + 1] =
-                    rgba[1];
-                this.imageData.data[(centy + y) * c.width + (centx + x) + 2] =
-                    rgba[2];
+            for (let y = -52; y < 52; y += 4) {
+                for (let x = -52; x < 52; x += 4) {
+                    this.imageData.data[
+                        (point[1] + y) * c.width + (point[0] + x) + 0
+                    ] = r;
+                    this.imageData.data[
+                        (point[1] + y) * c.width + (point[0] + x) + 1
+                    ] = g;
+                    this.imageData.data[
+                        (point[1] + y) * c.width + (point[0] + x) + 2
+                    ] = b;
+                    this.imageData.data[
+                        (point[1] + y) * c.width + (point[0] + x) + 3
+                    ] = 255;
+                }
             }
         }
-        console.log(this.imageData);
     }
 }
 
