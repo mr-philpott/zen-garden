@@ -23,6 +23,37 @@ function InRange(check, compare, range) {
     return true;
 }
 
+class Polygon {
+    constructor(verts) {
+        this.verts = verts;
+    }
+
+    GetEqs() {
+        this.eqs = {};
+        for (let i = 0; i < this.verts.length; i++) {
+            let iplus1 = i + 1 > this.verts.length - 1 ? 0 : i + 1;
+            this.eqs[`line${i}`] = {
+                x0: this.verts[i],
+                x1: this.verts[iplus1],
+                y0: this.verts[i],
+                y1: this.verts[iplus1],
+                m:
+                    (this.verts[iplus1][1] - this.verts[i][1]) /
+                    (this.verts[iplus1][0] - this.verts[i][0]),
+            };
+        }
+        return this.eqs;
+    }
+}
+
+let poly = new Polygon([
+    [0, 0],
+    [0, 1],
+    [1, 1],
+    [1, 0],
+]);
+console.log(poly.GetEqs());
+
 // Generates and updates the map
 class Map {
     constructor() {
@@ -218,6 +249,7 @@ class Map {
                 }
             }
         }
+
         let numOfRocks;
         if (blues.length > 10000) {
             numOfRocks = 25;
@@ -241,6 +273,22 @@ class Map {
     Rocks(centx, centy) {
         let turn = (Math.PI * 2) / ROCK_VERTS;
         let points = [];
+        let eqs = [];
+
+        for (let i = 0; i < ROCK_VERTS; i++) {
+            let x =
+                Math.cos(turn * i) * ROCK_RADIUS +
+                Math.cos(turn * i) *
+                    Math.floor(Math.random() * ROCK_OFFSET_RANGE);
+            let y =
+                Math.sin(turn * i) * ROCK_RADIUS +
+                Math.sin(turn * i) *
+                    Math.floor(Math.random() * ROCK_OFFSET_RANGE);
+            points.push([x, y]);
+        }
+
+        for (let point of points) {
+        }
 
         for (let y = -70 * 2; y < 70 * 2; y += 4) {
             for (let x = -70 * 2; x < 70 * 2; x += 4) {
